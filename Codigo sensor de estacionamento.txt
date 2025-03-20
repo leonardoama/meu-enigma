@@ -1,0 +1,80 @@
+Código Sensor de Estacionamento
+
+// Configuração de Distância Mínima em centímetros
+const int distancia_carro = 10;
+
+// Configurações de Portas do Arduino
+const int TRIG = 3;
+const int ECHO = 2;
+
+// LEDs
+const int ledGreen = 8;
+const int ledRed = 7;
+
+// Tempo de pulso para o trigger do sensor
+const int trigger_time = 10;
+
+void setup() {
+  Serial.begin(9600);
+  
+  // Configurações do Sensor
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  
+  // Configurações dos LEDs
+  pinMode(ledGreen, OUTPUT);
+  pinMode(ledRed, OUTPUT);
+}
+
+void loop() {
+  int distancia = medir_distancia(TRIG, ECHO);
+
+  if (distancia > 0) { // Verifica se a leitura foi válida
+    if (distancia <= distancia_carro) {
+      Serial.print("Atenção: ");
+      Serial.print(distancia);
+      Serial.println(" cm");
+      digitalWrite(ledGreen, LOW);
+      digitalWrite(ledRed, HIGH);
+    } else {
+      Serial.print("Livre: ");
+      Serial.print(distancia);
+      Serial.println(" cm");
+      digitalWrite(ledGreen, HIGH);
+      digitalWrite(ledRed, LOW);
+    }
+  } else {
+    Serial.println("Erro na leitura do sensor.");
+  }
+
+  delay(100);
+}
+
+int medir_distancia(int pinotrig, int pinoecho) {
+  digitalWrite(pinotrig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pinotrig, HIGH);
+  delayMicroseconds(trigger_time);
+  digitalWrite(pinotrig, LOW);
+
+  long duracao = pulseIn(pinoecho, HIGH);
+
+  if (duracao == 0) {
+    return -1; // Retorna -1 caso a leitura falhe
+  }
+
+  return duracao / 58; // Converte tempo em microsegundos para centímetros
+}
+
+
+Componentes:
+
+●	Arduino Uno
+●	Sensor Ultrassônico HC-SR04
+●	LED Verde
+●	LED Vermelho
+●	Resistores de 100Ω
+●	Protoboard e fios de conexão
+
+
+
